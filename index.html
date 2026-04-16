@@ -393,7 +393,7 @@ function renderSalesChart(orders) {
     byDay[days[d.getDay()]+(i===0?' hoy':'')] = 0;
   }
   orders.forEach(o=>{
-    if(o.status==='paid'||o.status==='delivered'){
+    if(o.status==='paid'||o.status==='delivered'||o.status==='payment_done'){
       const d=new Date(o.date_created);
       const diff=Math.floor((Date.now()-d.getTime())/86400000);
       if(diff<7){
@@ -435,8 +435,8 @@ function renderOrder(order) {
   const title=order.order_items?.[0]?.item?.title||'Producto';
   const qty=order.order_items?.[0]?.quantity||1;
   const buyer=order.buyer?.nickname||'—';
-  const map={paid:'paid',delivered:'paid',payment_in_process:'pending',pending:'pending',cancelled:'cancelled'};
-  const labels={paid:'pagada',delivered:'entregada',payment_in_process:'pago en proceso',pending:'pendiente',cancelled:'cancelada'};
+  const map={paid:'paid',delivered:'paid',payment_done:'paid',payment_in_process:'pending',pending:'pending',cancelled:'cancelled'};
+  const labels={paid:'pagada',delivered:'entregada',payment_done:'pago confirmado',payment_in_process:'pago en proceso',pending:'pendiente',cancelled:'cancelada'};
   const cls=map[order.status]||'pending';
   return `<div class="order-card fade-in">
     <div>
@@ -494,7 +494,7 @@ function renderAll() {
     const t=new Date(o.date_created).getTime();
     return t>=fromMs && t<=toMs;
   });
-  const paidInRange=ordersInRange.filter(o=>o.status==='paid'||o.status==='delivered');
+  const paidInRange=ordersInRange.filter(o=>o.status==='paid'||o.status==='delivered'||o.status==='payment_done');
   const revenue=paidInRange.reduce((a,o)=>a+(o.total_amount||0),0);
 
   document.getElementById('metricsRow').innerHTML=`
